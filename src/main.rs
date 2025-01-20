@@ -1,3 +1,5 @@
+mod messages;
+
 use std::{
     sync::mpsc::{sync_channel, Receiver, SyncSender},
     thread,
