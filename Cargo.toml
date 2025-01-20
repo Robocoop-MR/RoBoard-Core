@@ -1,0 +1,12 @@
+[package]
+name = "roboard_core" # the name of the package
+version = "0.1.0"    # the current version, obeying semver
+authors = ["kalmenn <kale@kalmenn.fr>"]
+edition = '2021'
+license = "MIT"
+
+[dependencies]
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3.19"
+flatbuffers = "24.12.23"

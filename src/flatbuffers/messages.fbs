@@ -1,0 +1,9 @@
+include "geometry.fbs";
+
+table PositionUpdate {
+  pos: Vec3 (required);
+}
+
+union Message {
+  PositionUpdate:PositionUpdate,
+}
