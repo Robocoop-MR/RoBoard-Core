@@ -10,3 +10,4 @@ anyhow = "1.0"
 tracing = "0.1"
 tracing-subscriber = "0.3.19"
 flatbuffers = "24.12.23"
+nng-sys = { git = "ssh://git@github.com/Robocoop-MR/rust-nng-sys.git", rev = "59fdffa6a93518e6c6584615bd6e2b736036782a" }

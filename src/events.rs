@@ -10,5 +10,5 @@ pub enum Event {
 #[derive(Debug, Clone)]
 pub struct AddressBook {
     pub usb_sender_thread: SyncSender<Event>,
-    pub nng_receiver_thread: SyncSender<Event>,
+    pub nng_reciever_thread: SyncSender<Event>,
 }

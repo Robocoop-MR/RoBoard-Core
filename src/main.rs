@@ -1,10 +1,10 @@
+mod events;
 mod messages;
 mod nng_reciever;
 mod usb_sender;
-mod events;
 
 use std::{
-    sync::mpsc::{sync_channel, Receiver, SyncSender},
+    sync::mpsc::{sync_channel, Receiver},
     thread,
 };
 
@@ -16,21 +16,21 @@ use tracing_subscriber::{layer::SubscriberExt as _, util::SubscriberInitExt as _
 
 struct Receivers {
     usb_sender_thread: Receiver<Event>,
-    nng_receiver_thread: Receiver<Event>,
+    nng_reciever_thread: Receiver<Event>,
 }
 
 fn create_channels() -> (Receivers, AddressBook) {
-    let (usb_sender_thread_sender, usb_sender_thread_receiver) = sync_channel(128);
-    let (nng_receiver_thread_sender, nng_receiver_thread_receiver) = sync_channel(128);
+    let (usb_sender_thread_sender, usb_sender_thread_reciever) = sync_channel(128);
+    let (nng_reciever_thread_sender, nng_reciever_thread_reciever) = sync_channel(128);
 
     (
         Receivers {
-            usb_sender_thread: usb_sender_thread_receiver,
-            nng_receiver_thread: nng_receiver_thread_receiver,
+            usb_sender_thread: usb_sender_thread_reciever,
+            nng_reciever_thread: nng_reciever_thread_reciever,
         },
         AddressBook {
             usb_sender_thread: usb_sender_thread_sender,
-            nng_receiver_thread: nng_receiver_thread_sender,
+            nng_reciever_thread: nng_reciever_thread_sender,
         },
     )
 }
@@ -54,17 +54,14 @@ fn main() -> anyhow::Result<()> {
     let (
         Receivers {
             usb_sender_thread,
-            nng_receiver_thread,
+            nng_reciever_thread,
         },
         ab,
     ) = create_channels();
 
     // --- Starting threads
 
-    let nng_receiver_thread = {
-        let ab = ab.clone();
-        thread::spawn(|| nng_reciever::main(ab, nng_receiver_thread))
-    };
+    nng_reciever::start(ab.clone(), nng_reciever_thread)?;
     let usb_sender_thread = {
         let ab = ab.clone();
         thread::spawn(|| usb_sender::main(ab, usb_sender_thread))
@@ -78,11 +75,8 @@ fn main() -> anyhow::Result<()> {
     // TODO: handle threads unexpectedly closing
     // (close the rest of the threads or try to restart)
 
-    if let Err(err) = nng_receiver_thread.join() {
-        error!("NNG receiver thread closed: {err:?}");
-    }
     if let Err(err) = usb_sender_thread.join() {
-        error!("NNG receiver thread closed: {err:?}");
+        error!("NNG reciever thread closed: {err:?}");
     }
 
     Ok(())
